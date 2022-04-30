@@ -44,11 +44,9 @@ class Bech32BaseUtils:
     def evmos_bech32_encode(hrp, data, spec):
         """Compute a Bech32 string given HRP and data values."""
         bech32_hrp_expand = [ord(x) >> 5 for x in hrp] + [0] + [ord(x) & 31 for x in hrp]
-        values = bech32_hrp_expand + data
+        values = bech32_hrp_expand + data + [0, 0, 0, 0, 0, 0]
         BECH32M_CONST = 0x2bc830a3
         const = BECH32M_CONST if spec == 2 else 1
-
-        values = values + [0, 0, 0, 0, 0, 0]
         generator = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3]
         chk = 1
         for value in values:
@@ -56,7 +54,6 @@ class Bech32BaseUtils:
             chk = (chk & 0x1ffffff) << 5 ^ value
             for i in range(5):
                 chk ^= generator[i] if ((top >> i) & 1) else 0
-
         polymod = chk ^ const
         combined = data + [(polymod >> 5 * (5 - i)) & 31 for i in range(6)]
         CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l'
