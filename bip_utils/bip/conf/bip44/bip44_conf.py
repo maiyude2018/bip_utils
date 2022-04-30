@@ -28,6 +28,7 @@ from bip_utils.addr import (
     SubstrateEd25519AddrEncoder, TrxAddrEncoder, XlmAddrTypes, XlmAddrEncoder, XmrAddrEncoder,
     XrpAddrEncoder, XtzAddrPrefixes, XtzAddrEncoder, ZilAddrEncoder
 )
+
 from bip_utils.bip.bip32 import (
     Bip32Const, Bip32KeyNetVersions, Bip32Ed25519Slip, Bip32Ed25519Blake2bSlip, Bip32Nist256p1, Bip32Secp256k1
 )
@@ -35,6 +36,7 @@ from bip_utils.bip.conf.common import (
     BipCoinConf, BipBitcoinCashConf, BipLitecoinConf, HARDENED_DEF_PATH, NOT_HARDENED_DEF_PATH
 )
 from bip_utils.coin_conf import CoinsConf
+from bip_utils.addr.eth_addr import EvmosAddrEncoder
 
 
 # Bitcoin key net version for main net (same as BIP32)
@@ -340,6 +342,22 @@ class Bip44Conf:
         },
     )
 
+    # Configuration for Ixo
+    Ixo: BipCoinConf = BipCoinConf(
+        coin_names=CoinsConf.Ixo.CoinNames(),
+        coin_idx=118,
+        is_testnet=False,
+        def_path=NOT_HARDENED_DEF_PATH,
+        key_net_ver=_BIP44_BTC_KEY_NET_VER_MAIN,
+        wif_net_ver=None,
+        bip32_cls=Bip32Secp256k1,
+        addr_cls=AtomAddrEncoder,
+        addr_params={
+            "hrp": CoinsConf.Ixo.Params("addr_hrp"),
+        },
+    )
+
+
     # Configuration for Cosmos
     Cosmos: BipCoinConf = BipCoinConf(
         coin_names=CoinsConf.Cosmos.CoinNames(),
@@ -495,6 +513,20 @@ class Bip44Conf:
         bip32_cls=Bip32Secp256k1,
         addr_cls=EthAddrEncoder,
         addr_params={},
+    )
+
+    Evmos: BipCoinConf = BipCoinConf(
+        coin_names=CoinsConf.Evmos.CoinNames(),
+        coin_idx=60,
+        is_testnet=False,
+        def_path=NOT_HARDENED_DEF_PATH,
+        key_net_ver=_BIP44_BTC_KEY_NET_VER_MAIN,
+        wif_net_ver=None,
+        bip32_cls=Bip32Secp256k1,
+        addr_cls=EvmosAddrEncoder,
+        addr_params={
+            "hrp": CoinsConf.Evmos.Params("addr_hrp"),
+        },
     )
     # Configuration for Ethereum Classic
     EthereumClassic: BipCoinConf = BipCoinConf(
