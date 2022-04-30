@@ -257,11 +257,26 @@ class CoinsConf:
         },
     )
 
+    # Configuration for Ixo
+    Ixo: CoinConf = CoinConf(
+        coin_name=CoinNames("Ixo", "IXO"),
+        params={
+            "addr_hrp": "ixo",
+        },
+    )
+
     # Configuration for Cosmos
     Cosmos: CoinConf = CoinConf(
         coin_name=CoinNames("Cosmos", "ATOM"),
         params={
             "addr_hrp": "cosmos",
+        },
+    )
+
+    Evmos: CoinConf = CoinConf(
+        coin_name=CoinNames("Evmos", "EVMOS"),
+        params={
+            "addr_hrp": "evmos",
         },
     )
 
