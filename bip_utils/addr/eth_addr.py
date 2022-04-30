@@ -29,6 +29,8 @@ from bip_utils.addr.iaddr_encoder import IAddrEncoder
 from bip_utils.coin_conf import CoinsConf
 from bip_utils.ecc import IPublicKey
 from bip_utils.utils.misc import BytesUtils, CryptoUtils
+import binascii
+from bip_utils.bech32.bech32_base import Bech32BaseUtils
 
 
 class EthAddrConst:
@@ -129,6 +131,10 @@ class EthAddrEncoder(IAddrEncoder):
         skip_chksum_enc = kwargs.get("skip_chksum_enc", False)
 
         pub_key_obj = AddrKeyValidator.ValidateAndGetSecp256k1Key(pub_key)
+        #from bip_utils.bech32 import Bech32ChecksumError, Bech32Decoder, Bech32Encoder
+        #hrp="evmos"
+        #evmos_add=Bech32Encoder.Encode(hrp,CryptoUtils.Hash160(pub_key_obj.RawCompressed().ToBytes()))
+        #print(evmos_add)
 
         # First byte of the uncompressed key (i.e. 0x04) is not needed
         kekkak_hex = BytesUtils.ToHexString(CryptoUtils.Kekkak256(pub_key_obj.RawUncompressed().ToBytes()[1:]))
@@ -136,6 +142,58 @@ class EthAddrEncoder(IAddrEncoder):
         return CoinsConf.Ethereum.Params("addr_prefix") + (_EthAddrUtils.ChecksumEncode(addr)
                                                            if not skip_chksum_enc
                                                            else addr)
+
+class EvmosAddrEncoder(IAddrEncoder):
+    """
+    Ethereum address encoder class.
+    It allows the Ethereum address encoding.
+    """
+
+    @staticmethod
+    def EncodeKey(pub_key: Union[bytes, IPublicKey],
+                  **kwargs: Any) -> str:
+        """
+        Encode a public key to Ethereum address.
+
+        Args:
+            pub_key (bytes or IPublicKey): Public key bytes or object
+
+        Other Parameters:
+            skip_chksum_enc (bool, optional): True to skip checksum encoding, false otherwise (default)
+
+        Returns:
+            str: Address string
+
+        Raised:
+            ValueError: If the public key is not valid
+            TypeError: If the public key is not secp256k1
+        """
+        skip_chksum_enc = kwargs.get("skip_chksum_enc", False)
+
+        pub_key_obj = AddrKeyValidator.ValidateAndGetSecp256k1Key(pub_key)
+        #from bip_utils.bech32 import Bech32ChecksumError, Bech32Decoder, Bech32Encoder
+        #hrp="evmos"
+        #evmos_add=Bech32Encoder.Encode(hrp,CryptoUtils.Hash160(pub_key_obj.RawCompressed().ToBytes()))
+        #print(evmos_add)
+
+        # First byte of the uncompressed key (i.e. 0x04) is not needed
+        kekkak_hex = BytesUtils.ToHexString(CryptoUtils.Kekkak256(pub_key_obj.RawUncompressed().ToBytes()[1:]))
+        addr = kekkak_hex[EthAddrConst.START_BYTE:]
+        array = binascii.unhexlify(addr)
+        words = [x for x in array]
+        bech32_words = Bech32BaseUtils.ConvertBits(words, 8, 5)
+        bech32_address = Bech32BaseUtils.bech32_encode("evmos", bech32_words, 1)
+        #bech32_address = bech32_encode("evmos", bech32_words, 1)
+
+        return [CoinsConf.Ethereum.Params("addr_prefix") + (_EthAddrUtils.ChecksumEncode(addr)
+                                                           if not skip_chksum_enc
+                                                           else addr),bech32_address]
+
+
+
+
+
+
 
 
 class EthAddr(EthAddrEncoder):
