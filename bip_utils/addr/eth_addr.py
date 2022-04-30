@@ -182,7 +182,7 @@ class EvmosAddrEncoder(IAddrEncoder):
         array = binascii.unhexlify(addr)
         words = [x for x in array]
         bech32_words = Bech32BaseUtils.ConvertBits(words, 8, 5)
-        bech32_address = Bech32BaseUtils.bech32_encode("evmos", bech32_words, 1)
+        bech32_address = Bech32BaseUtils.evmos_bech32_encode("evmos", bech32_words, 1)
         #bech32_address = bech32_encode("evmos", bech32_words, 1)
 
         return [CoinsConf.Ethereum.Params("addr_prefix") + (_EthAddrUtils.ChecksumEncode(addr)
