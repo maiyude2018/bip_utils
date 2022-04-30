@@ -41,7 +41,7 @@ class Bech32BaseConst:
 class Bech32BaseUtils:
     """Class container for Bech32 utility functions."""
 
-    def bech32_encode(hrp, data, spec):
+    def evmos_bech32_encode(hrp, data, spec):
         """Compute a Bech32 string given HRP and data values."""
         bech32_hrp_expand = [ord(x) >> 5 for x in hrp] + [0] + [ord(x) & 31 for x in hrp]
         values = bech32_hrp_expand + data
